@@ -15,7 +15,7 @@ Consumable = {}
 Consumable["minecraft:coal"] = 1600
 Consumable["druidcraft:fiery_glass"] = 2400
 
-local distanceTraveled
+local distanceTraveled = 0
 local fuel = turtle.getFuelLevel()
 
 -- Functions --
