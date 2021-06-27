@@ -5,8 +5,8 @@
 
 IgnoredItem = {"minecraft:stone", "minecraft:cobblestone", "minecraft:gravel",
 "minecraft:dirt", "minecraft:water", "minecraft:red_mushroom", "minecraft:sand",
-"minecraft:netherrack", "Botania:stone", "Botania:mushroom", "chisel:limestone",
-"chisel:andesite", "chisel:diorite", "chisel:granite", "chisel:marble",
+"minecraft:netherrack", "Botania:stone", "Botania:mushroom", "minecraft:limestone",
+"minecraft:andesite", "minecraft:diorite", "minecraft:granite", "minecraft:marble",
 "BiomesOPlenty:flowers", "BiomesOPlenty:flowers2"}
 
 -- short list, so this is a concise way of checking. Info doesn't
@@ -48,7 +48,49 @@ function RefuelWithLava(direction)
     return false
 end
 
+function DigPillar()
+    -- maybe condense --
+    if turtle.detect() then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("front")
+        else
+            turtle.dig()
+            if turtle.getItemCount(13) > 0 then
+                MakeSpace()
+            end
+        end
+        turtle.forward()
+    end
+    if turtle.detectUp() then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("up")
+        else
+            turtle.digUp()
+            if turtle.getItemCount(13) > 0 then
+                MakeSpace()
+            end
+        end
+    end
+    if turtle.detectDown() then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("up")
+        else
+            turtle.digDown()
+            if turtle.getItemCount(13) > 0 then
+                MakeSpace()
+            end
+        end
+    end
+end
+
 function DumpTrash()
+    turtle.down()
+    turtle.digDown()
+    turtle.up()
+
     for slot = firstUsed, lastUsed
     do
         table = turtle.getItemDetail(slot)
@@ -57,6 +99,7 @@ function DumpTrash()
             turtle.dropDown()
         end
     end
+    turtle.select(firstUsed)
 end
 
 function MakeSpace()
@@ -69,9 +112,10 @@ function MakeSpace()
         table = turtle.getItemDetail(slot)
         print("Make Space Status: ", table, slot)
         if table then
-            if Consumable[name] then
+            if Consumable[table.name] then
                 turtle.select(slot)
                 turtle.refuel(table.count)
+                print("Refueled: ", fuel, " -> ", turtle.getFuelLevel())
                 fuel = turtle.getFuelLevel()
             end
             if KeepItem(table.name) then
@@ -87,38 +131,25 @@ function MakeSpace()
     DumpTrash()
 end
 
-function DigForward()
-    -- check if Lava, if so grab and refuel --
-    if turtle.detect() then
-        _, data = turtle.inspectUp()
-        if data.name == "minecraft:lava" then
-            RefuelWithLava("front")
-        else
-            turtle.dig()
-        end
-    end
-    if turtle.detectUp() then
-        _, data = turtle.inspectUp()
-        if data.name == "minecraft:lava" then
-            RefuelWithLava("up")
-        else
-            turtle.digUp()
-        end
-    end
-    turtle.forward()
-    if turtle.getItemCount(13) > 0 then
-        MakeSpace()
-    end
-    distanceTraveled = distanceTraveled + 1
+function Advance()
+    -- Dig a 3x3x2 section --
+    DigPillar()
+    turtle.turnRight()
+    DigPillar()
+    DigPillar()
+    turtle.turnLeft()
+    DigPillar()
+    turtle.turnLeft()
+    DigPillar()
+    DigPillar()
+    turtle.turnRight()
+
+    distanceTraveled = distanceTraveled + 2
 end
 
 function GoHome()
     turtle.turnLeft()
     turtle.turnLeft()
-    if turtle.detectUp() then
-        turtle.digUp()
-    end
-    turtle.up()
     for i = 1, distanceTraveled
     do
         turtle.forward()
@@ -130,9 +161,9 @@ function GoHome()
 end
 
 function Run()
-    while fuel > distanceTraveled
+    while fuel > (distanceTraveled - 2)
     do
-        DigForward()
+        Advance()
         fuel = turtle.getFuelLevel()
     end
     GoHome()
