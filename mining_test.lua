@@ -18,7 +18,7 @@ Consumable["druidcraft:fiery_glass"] = 2400
 local distanceTraveled = 0
 local fuel = turtle.getFuelLevel()
 local firstUsed = 2
-local lastUsed = 4
+local lastUsed = 16
 
 -- Functions --
 
@@ -34,16 +34,18 @@ function KeepItem(name)
     return true
 end
 
-function DigForward()
-    -- check if Lava, if so grab and refuel --
-    if turtle.detect() then
-        turtle.dig()
+function RefuelWithLava(direction)
+    if turtle.getFuelLevel() < turtle.getFuelLimit() then
+        turtle.select(2)
+        if direction == "front" then
+            turtle.place()
+        elseif direction == "up" then
+            turtle.placeUp()
+        end
+        turtle.refuel()
+        return true
     end
-    turtle.forward()
-    if turtle.getItemCount(4) > 0 then
-        MakeSpace()
-    end
-    distanceTraveled = distanceTraveled + 1
+    return false
 end
 
 function DumpTrash()
@@ -83,6 +85,27 @@ function MakeSpace()
     turtle.suck()
 
     DumpTrash()
+end
+
+function DigForward()
+    -- check if Lava, if so grab and refuel --
+    if turtle.detect() then
+        if turtle.inspect().name == "minecraft:lava" then
+            RefuelWithLava("front")
+        end
+        turtle.dig()
+    end
+    if turtle.detectUp() then
+        if turtle.inspectUp().name == "minecraft:lava" then
+            RefuelWithLava("up")
+        end
+        turtle.digUp()
+    end
+    turtle.forward()
+    if turtle.getItemCount(13) > 0 then
+        MakeSpace()
+    end
+    distanceTraveled = distanceTraveled + 1
 end
 
 function GoHome()
