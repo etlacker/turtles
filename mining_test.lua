@@ -48,44 +48,6 @@ function RefuelWithLava(direction)
     return false
 end
 
-function DigPillar()
-    -- maybe condense --
-    if turtle.detect() then
-        _, data = turtle.inspectUp()
-        if data.name == "minecraft:lava" then
-            RefuelWithLava("front")
-        else
-            turtle.dig()
-            if turtle.getItemCount(13) > 0 then
-                MakeSpace()
-            end
-        end
-        turtle.forward()
-    end
-    if turtle.detectUp() then
-        _, data = turtle.inspectUp()
-        if data.name == "minecraft:lava" then
-            RefuelWithLava("up")
-        else
-            turtle.digUp()
-            if turtle.getItemCount(13) > 0 then
-                MakeSpace()
-            end
-        end
-    end
-    if turtle.detectDown() then
-        _, data = turtle.inspectUp()
-        if data.name == "minecraft:lava" then
-            RefuelWithLava("up")
-        else
-            turtle.digDown()
-            if turtle.getItemCount(13) > 0 then
-                MakeSpace()
-            end
-        end
-    end
-end
-
 function DumpTrash()
     turtle.down()
     turtle.digDown()
@@ -103,32 +65,68 @@ function DumpTrash()
 end
 
 function MakeSpace()
-    --- check if can place chest ---
-    turtle.digDown()
-    turtle.select(1)
-    turtle.placeDown()
-    for slot = firstUsed, lastUsed
-    do
-        table = turtle.getItemDetail(slot)
-        print("Make Space Status: ", table, slot)
-        if table then
-            if Consumable[table.name] then
-                turtle.select(slot)
-                turtle.refuel(table.count)
-                print("Refueled: ", fuel, " -> ", turtle.getFuelLevel())
-                fuel = turtle.getFuelLevel()
-            end
-            if KeepItem(table.name) then
-                turtle.select(slot)
-                turtle.dropDown()
+    if turtle.getItemCount(13) > 0 then
+        --- check if can place chest ---
+        turtle.digDown()
+        turtle.select(1)
+        turtle.placeDown()
+        for slot = firstUsed, lastUsed
+        do
+            table = turtle.getItemDetail(slot)
+            print("Make Space Status: ", table, slot)
+            if table then
+                if Consumable[table.name] then
+                    turtle.select(slot)
+                    turtle.refuel(table.count)
+                    print("Refueled: ", fuel, " -> ", turtle.getFuelLevel())
+                    fuel = turtle.getFuelLevel()
+                end
+                if KeepItem(table.name) then
+                    turtle.select(slot)
+                    turtle.dropDown()
+                end
             end
         end
-    end
-    turtle.select(1)
-    turtle.digDown()
-    turtle.suck()
+        turtle.select(1)
+        turtle.digDown()
+        turtle.suck()
 
-    DumpTrash()
+        DumpTrash()
+    end
+end
+
+function DigPillar()
+    -- maybe condense --
+    if turtle.detect() then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("front")
+        else
+            turtle.dig()
+            MakeSpace()
+        end
+        turtle.forward()
+    else
+        turtle.forward()
+    end
+    if turtle.detectUp() then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("up")
+        else
+            turtle.digUp()
+            MakeSpace()
+        end
+    end
+    if turtle.detectDown() then
+        _, data = turtle.inspectDown()
+        if data.name == "minecraft:lava" then
+            RefuelWithLava("down")
+        else
+            turtle.digDown()
+            MakeSpace()
+        end
+    end
 end
 
 function Advance()
