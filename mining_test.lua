@@ -59,18 +59,22 @@ function MakeSpace()
     turtle.placeDown()
     for slot = firstUsed, lastUsed
     do
-        if pcall(Consumable[turtle.getItemDetail(slot).name]) then
-            turtle.select(slot)
-            turtle.refuel(turtle.getItemDetail(slot).count)
-            fuel = turtle.getFuelLevel()
-        end
-        if pcall(KeepItem(turtle.getItemDetail(slot).name)) then
-            turtle.select(slot)
-            turtle.dropDown()
+        status, name = pcall(turtle.getItemDetail(slot).name)
+        if status then
+            if Consumable[name] then
+                turtle.select(slot)
+                turtle.refuel(turtle.getItemDetail(slot).count)
+                fuel = turtle.getFuelLevel()
+            end
+            if pcall(KeepItem(name)) then
+                turtle.select(slot)
+                turtle.dropDown()
+            end
         end
     end
     turtle.select(1)
     turtle.digDown()
+    turtle.suck()
 
     DumpTrash()
 end
