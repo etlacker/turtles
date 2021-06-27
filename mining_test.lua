@@ -21,7 +21,7 @@ local fuel = turtle.getFuelLevel()
 -- Functions --
 
 function KeepItem(name)
-    for item in IgnoredItem
+    for _, item in IgnoredItem
     do
         if name == item then
             return false
