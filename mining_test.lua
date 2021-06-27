@@ -47,8 +47,11 @@ end
 function DumpTrash()
     for slot = firstUsed, lastUsed
     do
-        turtle.select(slot)
-        turtle.dropDown()
+        status, name = pcall(turtle.getItemDetail(slot).name)
+        if status then
+            turtle.select(slot)
+            turtle.dropDown()
+        end
     end
 end
 
