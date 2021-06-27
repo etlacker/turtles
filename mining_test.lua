@@ -90,16 +90,20 @@ end
 function DigForward()
     -- check if Lava, if so grab and refuel --
     if turtle.detect() then
-        if turtle.inspect().name == "minecraft:lava" then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
             RefuelWithLava("front")
+        else
+            turtle.dig()
         end
-        turtle.dig()
     end
     if turtle.detectUp() then
-        if turtle.inspectUp().name == "minecraft:lava" then
+        _, data = turtle.inspectUp()
+        if data.name == "minecraft:lava" then
             RefuelWithLava("up")
+        else
+            turtle.digUp()
         end
-        turtle.digUp()
     end
     turtle.forward()
     if turtle.getItemCount(13) > 0 then
