@@ -26,8 +26,10 @@ function KeepItem(name)
     for _, item in ipairs(IgnoredItem)
     do
         if name == item then
+            print("Keeping ", name)
             return false
         end
+        print("Not Keeping ", name)
     end
     return true
 end
@@ -64,12 +66,13 @@ function MakeSpace()
     do
         status, name = pcall(turtle.getItemDetail(slot).name)
         if status then
+            print("Make Space Status ", status)
             if Consumable[name] then
                 turtle.select(slot)
                 turtle.refuel(turtle.getItemDetail(slot).count)
                 fuel = turtle.getFuelLevel()
             end
-            if pcall(KeepItem(name)) then
+            if KeepItem(name) then
                 turtle.select(slot)
                 turtle.dropDown()
             end
