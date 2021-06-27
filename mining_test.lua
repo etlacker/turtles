@@ -49,8 +49,8 @@ end
 function DumpTrash()
     for slot = firstUsed, lastUsed
     do
-        status, name = pcall(turtle.getItemDetail(slot).name)
-        if status then
+        table = pcall(turtle.getItemDetail(slot))
+        if table then
             turtle.select(slot)
             turtle.dropDown()
         end
@@ -64,15 +64,15 @@ function MakeSpace()
     turtle.placeDown()
     for slot = firstUsed, lastUsed
     do
-        status, name = pcall(turtle.getItemDetail(slot).name)
-        if status then
-            print("Make Space Status ", status)
+        table = pcall(turtle.getItemDetail(slot))
+        print("Make Space Status ", status)
+        if table then
             if Consumable[name] then
                 turtle.select(slot)
-                turtle.refuel(turtle.getItemDetail(slot).count)
+                turtle.refuel(table.count)
                 fuel = turtle.getFuelLevel()
             end
-            if KeepItem(name) then
+            if KeepItem(table.name) then
                 turtle.select(slot)
                 turtle.dropDown()
             end
